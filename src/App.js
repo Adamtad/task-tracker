@@ -1,4 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const STORAGE_KEY = "task-tracker-data";
+
+const DEFAULT_TASKS = [
+  {
+    id: "demo1", title: "Send project proposal email", priority: "High", category: "Work",
+    dueDate: new Date().toISOString().split("T")[0], done: false,
+    subtasks: [
+      { id: "s1", text: "Get sign-off from manager", done: true, dueDate: "" },
+      { id: "s2", text: "Attach budget spreadsheet", done: false, dueDate: new Date().toISOString().split("T")[0] },
+      { id: "s3", text: "Send to client", done: false, dueDate: "" },
+    ]
+  },
+  {
+    id: "demo2", title: "Renew gym membership", priority: "Low", category: "Health",
+    dueDate: "", description: "Check if they have a discount for annual payment.", done: false, subtasks: []
+  }
+];
+
+function loadPersistedState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.tasks)) return null;
+    const tasks = data.tasks.map((t) => ({
+      id: t.id || generateId(),
+      title: t.title ?? "",
+      priority: t.priority || "Medium",
+      category: t.category || "Work",
+      dueDate: t.dueDate || "",
+      description: t.description || "",
+      done: !!t.done,
+      subtasks: Array.isArray(t.subtasks)
+        ? t.subtasks.map((s) => ({
+            id: s.id || generateId(),
+            text: s.text ?? "",
+            done: !!s.done,
+            dueDate: s.dueDate || "",
+          }))
+        : [],
+    }));
+    const expandedIds = Array.isArray(data.expandedIds) ? data.expandedIds : [];
+    return { tasks, expandedIds };
+  } catch {
+    return null;
+  }
+}
 
 const CATEGORIES = ["Work", "Personal", "Finance", "Health", "Other"];
 const PRIORITIES = ["High", "Medium", "Low"];
@@ -380,27 +428,26 @@ function EditTaskModal({ task, onSave, onClose }) {
 }
 
 export default function TaskTracker() {
-  const [tasks, setTasks] = useState([
-    {
-      id: "demo1", title: "Send project proposal email", priority: "High", category: "Work",
-      dueDate: new Date().toISOString().split("T")[0], done: false,
-      subtasks: [
-        { id: "s1", text: "Get sign-off from manager", done: true, dueDate: "" },
-        { id: "s2", text: "Attach budget spreadsheet", done: false, dueDate: new Date().toISOString().split("T")[0] },
-        { id: "s3", text: "Send to client", done: false, dueDate: "" },
-      ]
-    },
-    {
-      id: "demo2", title: "Renew gym membership", priority: "Low", category: "Health",
-      dueDate: "", description: "Check if they have a discount for annual payment.", done: false, subtasks: []
-    }
-  ]);
+  const [tasks, setTasks] = useState(() => {
+    const s = loadPersistedState();
+    return s ? s.tasks : DEFAULT_TASKS;
+  });
   const [showAdd, setShowAdd] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [expanded, setExpanded] = useState(new Set(["demo1"]));
+  const [expanded, setExpanded] = useState(() => {
+    const s = loadPersistedState();
+    return s ? new Set(s.expandedIds) : new Set(["demo1"]);
+  });
   const [filter, setFilter] = useState("All");
   const [catFilter, setCatFilter] = useState("All");
   const [showDone, setShowDone] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ tasks, expandedIds: [...expanded] })
+    );
+  }, [tasks, expanded]);
 
   const toggleDone = (id) => {
     setTasks(tasks.map(t => {
