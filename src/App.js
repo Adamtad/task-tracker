@@ -614,6 +614,17 @@ export default function TaskTracker() {
               }}>{p}</button>
             ))}
             <div style={{ width: 1, background: "#eee", margin: "0 4px", alignSelf: "stretch" }} />
+            <button
+              onClick={() => setManagingCats(!managingCats)}
+              title={managingCats ? "Done managing" : "Manage categories"}
+              style={{
+                fontSize: 12, padding: "5px 10px", borderRadius: 20, border: "1.5px solid",
+                borderColor: managingCats ? "#4a7fa5" : "#e8e8e8",
+                background: managingCats ? "#f0f5fa" : "white",
+                color: managingCats ? "#4a7fa5" : "#bbb",
+                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0
+              }}
+            >{managingCats ? "Done" : "⚙"}</button>
             <button onClick={() => setCatFilter("All")} style={{
               fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
               borderColor: catFilter === "All" ? "#222" : "#e8e8e8",
@@ -647,17 +658,6 @@ export default function TaskTracker() {
                 )}
               </div>
             ))}
-            <button
-              onClick={() => setManagingCats(!managingCats)}
-              title={managingCats ? "Done managing" : "Manage categories"}
-              style={{
-                fontSize: 12, padding: "5px 10px", borderRadius: 20, border: "1.5px solid",
-                borderColor: managingCats ? "#4a7fa5" : "#e8e8e8",
-                background: managingCats ? "#f0f5fa" : "white",
-                color: managingCats ? "#4a7fa5" : "#bbb",
-                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0
-              }}
-            >{managingCats ? "Done" : "⚙"}</button>
           </div>
         </div>
       </div>
