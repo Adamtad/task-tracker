@@ -2,6 +2,16 @@ import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "task-tracker-data";
 
+const CAT_PALETTE = ["#4a7fa5", "#9b6db5", "#5a9e6f", "#d4754e", "#e09a2f", "#2d7d9a", "#c75b7a", "#6b8e6b", "#a06b0e", "#888"];
+
+const DEFAULT_CATEGORIES = [
+  { id: "cat_work", name: "Work", color: "#4a7fa5" },
+  { id: "cat_personal", name: "Personal", color: "#9b6db5" },
+  { id: "cat_finance", name: "Finance", color: "#5a9e6f" },
+  { id: "cat_health", name: "Health", color: "#d4754e" },
+  { id: "cat_other", name: "Other", color: "#888" },
+];
+
 const DEFAULT_TASKS = [
   {
     id: "demo1", title: "Send project proposal email", priority: "High", category: "Work",
@@ -42,13 +52,16 @@ function loadPersistedState() {
         : [],
     }));
     const expandedIds = Array.isArray(data.expandedIds) ? data.expandedIds : [];
-    return { tasks, expandedIds };
+    const categories =
+      Array.isArray(data.categories) && data.categories.length > 0
+        ? data.categories.filter((c) => c && c.id && c.name && c.color)
+        : null;
+    return { tasks, expandedIds, categories };
   } catch {
     return null;
   }
 }
 
-const CATEGORIES = ["Work", "Personal", "Finance", "Health", "Other"];
 const PRIORITIES = ["High", "Medium", "Low"];
 
 const PRIORITY_STYLES = {
@@ -57,16 +70,13 @@ const PRIORITY_STYLES = {
   Low: { dot: "#5a9e6f", bg: "#f0f7f3", text: "#3a7a52" },
 };
 
-const CAT_COLORS = {
-  Work: "#4a7fa5",
-  Personal: "#9b6db5",
-  Finance: "#5a9e6f",
-  Health: "#d4754e",
-  Other: "#888",
-};
-
 function generateId() {
   return Math.random().toString(36).slice(2, 9);
+}
+
+function getCatColor(categories, catName) {
+  const cat = categories.find((c) => c.name === catName);
+  return cat ? cat.color : "#888";
 }
 
 function formatDate(dateStr) {
@@ -167,11 +177,12 @@ function SubtaskList({ subtasks, onToggle, onDelete, onAdd, onUpdateDueDate }) {
   );
 }
 
-function TaskCard({ task, onToggleDone, onToggleSubtask, onDeleteSubtask, onAddSubtask, onUpdateSubtaskDueDate, onEdit, onDelete, onExpand, expanded }) {
+function TaskCard({ task, categories, onToggleDone, onToggleSubtask, onDeleteSubtask, onAddSubtask, onUpdateSubtaskDueDate, onEdit, onDelete, onExpand, expanded }) {
   const allSubtasksDone = task.subtasks.length > 0 && task.subtasks.every((s) => s.done);
   const p = PRIORITY_STYLES[task.priority];
   const effectiveDue = getEffectiveDueDate(task);
   const overdue = !task.done && isOverdue(effectiveDue);
+  const catColor = getCatColor(categories, task.category);
 
   return (
     <div style={{
@@ -202,7 +213,7 @@ function TaskCard({ task, onToggleDone, onToggleSubtask, onDeleteSubtask, onAddS
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             <span style={{ fontSize: 14, fontWeight: 500, color: task.done ? "#aaa" : "#222", textDecoration: task.done ? "line-through" : "none" }}>{task.title}</span>
             <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 20, background: p.bg, color: p.text, fontWeight: 500 }}>{task.priority}</span>
-            <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 20, background: "#f5f5f5", color: CAT_COLORS[task.category], fontWeight: 500 }}>{task.category}</span>
+            <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 20, background: "#f5f5f5", color: catColor, fontWeight: 500 }}>{task.category}</span>
           </div>
 
           {(effectiveDue || task.dueDate) && (
@@ -245,7 +256,58 @@ function TaskCard({ task, onToggleDone, onToggleSubtask, onDeleteSubtask, onAddS
   );
 }
 
-const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setCategory, dueDate, setDueDate, description, setDescription, steps, setSteps, isEdit }) => (
+function CategorySelect({ categories, value, onChange, onAddCategory }) {
+  const [showNew, setShowNew] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  const handleAdd = () => {
+    const name = newName.trim();
+    if (!name) return;
+    onAddCategory(name);
+    onChange(name);
+    setNewName("");
+    setShowNew(false);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={{ flex: 1, fontSize: 13, padding: "7px 10px", border: "1.5px solid #e8e8e8", borderRadius: 8, outline: "none", color: "#444", background: "white" }}
+        >
+          {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+        </select>
+        <button
+          type="button"
+          onClick={() => setShowNew(!showNew)}
+          title="Add new category"
+          style={{ fontSize: 15, padding: "5px 9px", background: "none", border: "1.5px solid #e8e8e8", borderRadius: 8, cursor: "pointer", color: "#888", lineHeight: 1 }}
+        >+</button>
+      </div>
+      {showNew && (
+        <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          <input
+            autoFocus
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") { setShowNew(false); setNewName(""); } }}
+            placeholder="New category name…"
+            style={{ flex: 1, fontSize: 13, padding: "6px 10px", border: "1.5px solid #e8e8e8", borderRadius: 8, outline: "none", color: "#444" }}
+          />
+          <button
+            type="button"
+            onClick={handleAdd}
+            style={{ fontSize: 12, padding: "6px 12px", background: "#222", color: "white", border: "none", borderRadius: 8, cursor: "pointer" }}
+          >Add</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setCategory, dueDate, setDueDate, description, setDescription, steps, setSteps, isEdit, categories, onAddCategory }) => (
   <>
     <input
       autoFocus={!isEdit}
@@ -283,9 +345,7 @@ const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setC
     <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 5 }}>Category</div>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: "100%", fontSize: 13, padding: "7px 10px", border: "1.5px solid #e8e8e8", borderRadius: 8, outline: "none", color: "#444", background: "white" }}>
-          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-        </select>
+        <CategorySelect categories={categories} value={category} onChange={setCategory} onAddCategory={onAddCategory} />
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 5 }}>Due Date</div>
@@ -321,10 +381,10 @@ const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setC
   </>
 );
 
-function AddTaskModal({ onAdd, onClose }) {
+function AddTaskModal({ onAdd, onClose, categories, onAddCategory }) {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [category, setCategory] = useState("Work");
+  const [category, setCategory] = useState(categories[0]?.name || "");
   const [dueDate, setDueDate] = useState("");
   const [description, setDescription] = useState("");
   const [steps, setSteps] = useState([{ text: "", dueDate: "" }]);
@@ -359,6 +419,8 @@ function AddTaskModal({ onAdd, onClose }) {
           description={description} setDescription={setDescription}
           steps={steps} setSteps={setSteps}
           isEdit={false}
+          categories={categories}
+          onAddCategory={onAddCategory}
         />
         <button
           onClick={handleSubmit}
@@ -370,7 +432,7 @@ function AddTaskModal({ onAdd, onClose }) {
   );
 }
 
-function EditTaskModal({ task, onSave, onClose }) {
+function EditTaskModal({ task, onSave, onClose, categories, onAddCategory }) {
   const [title, setTitle] = useState(task.title);
   const [priority, setPriority] = useState(task.priority);
   const [category, setCategory] = useState(task.category);
@@ -416,6 +478,8 @@ function EditTaskModal({ task, onSave, onClose }) {
           description={description} setDescription={setDescription}
           steps={steps} setSteps={setSteps}
           isEdit={true}
+          categories={categories}
+          onAddCategory={onAddCategory}
         />
         <button
           onClick={handleSubmit}
@@ -432,6 +496,10 @@ export default function TaskTracker() {
     const s = loadPersistedState();
     return s ? s.tasks : DEFAULT_TASKS;
   });
+  const [categories, setCategories] = useState(() => {
+    const s = loadPersistedState();
+    return s?.categories || DEFAULT_CATEGORIES;
+  });
   const [showAdd, setShowAdd] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [expanded, setExpanded] = useState(() => {
@@ -441,13 +509,27 @@ export default function TaskTracker() {
   const [filter, setFilter] = useState("All");
   const [catFilter, setCatFilter] = useState("All");
   const [showDone, setShowDone] = useState(false);
+  const [managingCats, setManagingCats] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ tasks, expandedIds: [...expanded] })
+      JSON.stringify({ tasks, expandedIds: [...expanded], categories })
     );
-  }, [tasks, expanded]);
+  }, [tasks, expanded, categories]);
+
+  const addCategory = (name) => {
+    if (categories.find((c) => c.name.toLowerCase() === name.toLowerCase())) return;
+    const usedColors = categories.map((c) => c.color);
+    const color = CAT_PALETTE.find((c) => !usedColors.includes(c)) || CAT_PALETTE[categories.length % CAT_PALETTE.length];
+    setCategories([...categories, { id: generateId(), name, color }]);
+  };
+
+  const deleteCategory = (id) => {
+    const cat = categories.find((c) => c.id === id);
+    if (cat && catFilter === cat.name) setCatFilter("All");
+    setCategories(categories.filter((c) => c.id !== id));
+  };
 
   const toggleDone = (id) => {
     setTasks(tasks.map(t => {
@@ -521,7 +603,7 @@ export default function TaskTracker() {
           </div>
 
           {/* Filters */}
-          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12 }}>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12, alignItems: "center" }}>
             {["All", ...PRIORITIES].map(p => (
               <button key={p} onClick={() => setFilter(p)} style={{
                 fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
@@ -531,16 +613,51 @@ export default function TaskTracker() {
                 cursor: "pointer", whiteSpace: "nowrap", fontWeight: filter === p ? 600 : 400
               }}>{p}</button>
             ))}
-            <div style={{ width: 1, background: "#eee", margin: "0 4px" }} />
-            {["All", ...CATEGORIES].map(c => (
-              <button key={c} onClick={() => setCatFilter(c)} style={{
-                fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
-                borderColor: catFilter === c ? CAT_COLORS[c] || "#222" : "#e8e8e8",
-                background: catFilter === c ? (CAT_COLORS[c] ? CAT_COLORS[c] + "18" : "#f5f5f5") : "white",
-                color: catFilter === c ? (CAT_COLORS[c] || "#222") : "#888",
-                cursor: "pointer", whiteSpace: "nowrap", fontWeight: catFilter === c ? 600 : 400
-              }}>{c}</button>
+            <div style={{ width: 1, background: "#eee", margin: "0 4px", alignSelf: "stretch" }} />
+            <button onClick={() => setCatFilter("All")} style={{
+              fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
+              borderColor: catFilter === "All" ? "#222" : "#e8e8e8",
+              background: catFilter === "All" ? "#222" : "white",
+              color: catFilter === "All" ? "white" : "#888",
+              cursor: "pointer", whiteSpace: "nowrap", fontWeight: catFilter === "All" ? 600 : 400
+            }}>All</button>
+            {categories.map(c => (
+              <div key={c.id} style={{ position: "relative", display: "inline-flex", alignItems: "center", flexShrink: 0 }}>
+                <button onClick={() => setCatFilter(c.name)} style={{
+                  fontSize: 12,
+                  padding: managingCats ? "5px 26px 5px 12px" : "5px 12px",
+                  borderRadius: 20, border: "1.5px solid",
+                  borderColor: catFilter === c.name ? c.color : "#e8e8e8",
+                  background: catFilter === c.name ? c.color + "18" : "white",
+                  color: catFilter === c.name ? c.color : "#888",
+                  cursor: "pointer", whiteSpace: "nowrap",
+                  fontWeight: catFilter === c.name ? 600 : 400,
+                  transition: "padding 0.15s"
+                }}>{c.name}</button>
+                {managingCats && (
+                  <button
+                    onClick={() => deleteCategory(c.id)}
+                    title={`Delete "${c.name}"`}
+                    style={{
+                      position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
+                      background: "none", border: "none", cursor: "pointer", color: "#bbb",
+                      fontSize: 14, lineHeight: 1, padding: 0, display: "flex", alignItems: "center"
+                    }}
+                  >×</button>
+                )}
+              </div>
             ))}
+            <button
+              onClick={() => setManagingCats(!managingCats)}
+              title={managingCats ? "Done managing" : "Manage categories"}
+              style={{
+                fontSize: 12, padding: "5px 10px", borderRadius: 20, border: "1.5px solid",
+                borderColor: managingCats ? "#4a7fa5" : "#e8e8e8",
+                background: managingCats ? "#f0f5fa" : "white",
+                color: managingCats ? "#4a7fa5" : "#bbb",
+                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0
+              }}
+            >{managingCats ? "Done" : "⚙"}</button>
           </div>
         </div>
       </div>
@@ -556,6 +673,7 @@ export default function TaskTracker() {
           <TaskCard
             key={task.id}
             task={task}
+            categories={categories}
             expanded={expanded.has(task.id)}
             onToggleDone={toggleDone}
             onToggleSubtask={toggleSubtask}
@@ -575,10 +693,10 @@ export default function TaskTracker() {
         )}
       </div>
 
-      {showAdd && <AddTaskModal onAdd={addTask} onClose={() => setShowAdd(false)} />}
+      {showAdd && <AddTaskModal onAdd={addTask} onClose={() => setShowAdd(false)} categories={categories} onAddCategory={addCategory} />}
       {editingTaskId && (() => {
         const task = tasks.find(t => t.id === editingTaskId);
-        return task ? <EditTaskModal task={task} onSave={updateTask} onClose={() => setEditingTaskId(null)} /> : null;
+        return task ? <EditTaskModal task={task} onSave={updateTask} onClose={() => setEditingTaskId(null)} categories={categories} onAddCategory={addCategory} /> : null;
       })()}
     </div>
   );
