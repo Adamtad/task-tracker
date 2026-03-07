@@ -1,6 +1,18 @@
-# Getting Started with Create React App
+# Task Tracker
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Deploy to Vercel (access from any device)
+
+Deploy to [Vercel](https://vercel.com) (free) to get a link you can open from your phone, tablet, or any computer:
+
+1. Install the Vercel CLI: `npm i -g vercel` or just use `npx vercel` (no install needed).
+2. In this project folder run: **`npx vercel`**
+3. Log in with GitHub or email when prompted.
+4. Accept the defaults (it will detect Create React App and use the existing `vercel.json`).
+5. For a production URL run: **`npx vercel --prod`**
+
+You’ll get a URL like `https://task-tracker-xxxx.vercel.app`. To update the site after making changes, run `npx vercel --prod` again from this folder.
 
 ## Available Scripts
 
