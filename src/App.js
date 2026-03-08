@@ -492,6 +492,48 @@ function EditTaskModal({ task, onSave, onClose, categories, onAddCategory }) {
   );
 }
 
+function UpdateBanner() {
+  const [reg, setReg] = useState(null);
+
+  useEffect(() => {
+    const handler = (e) => setReg(e.detail);
+    window.addEventListener("swUpdateAvailable", handler);
+    return () => window.removeEventListener("swUpdateAvailable", handler);
+  }, []);
+
+  if (!reg) return null;
+
+  const handleUpdate = () => {
+    if (reg.waiting) {
+      reg.waiting.postMessage("SKIP_WAITING");
+      reg.waiting.addEventListener("statechange", (e) => {
+        if (e.target.state === "activated") window.location.reload();
+      });
+    }
+  };
+
+  return (
+    <div style={{
+      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: "#222", color: "white", padding: "14px 20px",
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      fontSize: 13, boxShadow: "0 -2px 12px rgba(0,0,0,0.15)"
+    }}>
+      <span>A new version is available.</span>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={() => setReg(null)} style={{
+          background: "none", border: "1px solid #555", color: "#aaa",
+          padding: "6px 14px", borderRadius: 7, cursor: "pointer", fontSize: 13
+        }}>Later</button>
+        <button onClick={handleUpdate} style={{
+          background: "white", border: "none", color: "#222",
+          padding: "6px 14px", borderRadius: 7, cursor: "pointer", fontSize: 13, fontWeight: 600
+        }}>Update now</button>
+      </div>
+    </div>
+  );
+}
+
 export default function TaskTracker() {
   const [tasks, setTasks] = useState(() => {
     const s = loadPersistedState();
@@ -699,6 +741,7 @@ export default function TaskTracker() {
         const task = tasks.find(t => t.id === editingTaskId);
         return task ? <EditTaskModal task={task} onSave={updateTask} onClose={() => setEditingTaskId(null)} categories={categories} onAddCategory={addCategory} /> : null;
       })()}
+      <UpdateBanner />
     </div>
   );
 }

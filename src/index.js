@@ -18,6 +18,16 @@ reportWebVitals();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js");
+    navigator.serviceWorker.register("/sw.js").then((reg) => {
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            // A new version is ready but waiting — notify the app
+            window.dispatchEvent(new CustomEvent("swUpdateAvailable", { detail: reg }));
+          }
+        });
+      });
+    });
   });
 }

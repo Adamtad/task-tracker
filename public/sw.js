@@ -1,13 +1,12 @@
 const CACHE = "task-tracker-v1";
 
+const PRECACHE = ["/", "/index.html", "/manifest.json"];
+
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((cache) =>
-      cache.addAll(["/", "/index.html", "/static/js/main.chunk.js", "/static/js/bundle.js", "/manifest.json"])
-        .catch(() => cache.addAll(["/", "/index.html", "/manifest.json"]))
-    )
+    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE).catch(() => {}))
   );
-  self.skipWaiting();
+  // Do NOT skipWaiting — wait for user to approve update
 });
 
 self.addEventListener("activate", (e) => {
@@ -19,11 +18,19 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+// User clicked "Update" in the app
+self.addEventListener("message", (e) => {
+  if (e.data === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   e.respondWith(
     caches.match(e.request).then((cached) =>
-      cached || fetch(e.request).then((res) => {
+      cached ||
+      fetch(e.request).then((res) => {
         const clone = res.clone();
         caches.open(CACHE).then((c) => c.put(e.request, clone));
         return res;
