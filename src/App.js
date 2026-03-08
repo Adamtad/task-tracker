@@ -197,6 +197,7 @@ function TaskCard({ task, categories, onToggleDone, onToggleSubtask, onDeleteSub
         <button
           onClick={() => onToggleDone(task.id)}
           title={task.subtasks.length > 0 && !allSubtasksDone ? "Complete all steps first" : ""}
+          className="task-checkbox"
           style={{
             width: 20, height: 20, borderRadius: 5, flexShrink: 0, marginTop: 1,
             border: task.done ? "none" : "1.5px solid #ccc",
@@ -405,8 +406,8 @@ function AddTaskModal({ onAdd, onClose, categories, onAddCategory }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 16 }}>
-      <div style={{ background: "white", borderRadius: 14, padding: 24, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
+    <div className="modal-overlay" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 16 }}>
+      <div className="modal-content" style={{ background: "white", borderRadius: 14, padding: 24, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#222" }}>New Task</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#aaa", lineHeight: 1 }}>×</button>
@@ -464,8 +465,8 @@ function EditTaskModal({ task, onSave, onClose, categories, onAddCategory }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 16 }}>
-      <div style={{ background: "white", borderRadius: 14, padding: 24, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
+    <div className="modal-overlay" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 16 }}>
+      <div className="modal-content" style={{ background: "white", borderRadius: 14, padding: 24, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#222" }}>Edit Task</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#aaa", lineHeight: 1 }}>×</button>
@@ -592,20 +593,20 @@ export default function TaskTracker() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f8f6", fontFamily: "'Georgia', serif", padding: "0 0 60px" }}>
       {/* Header */}
-      <div style={{ background: "white", borderBottom: "1px solid #efefef", padding: "20px 24px 0" }}>
+      <div className="app-header-bar" style={{ background: "white", borderBottom: "1px solid #efefef", padding: "20px 24px 0" }}>
         <div style={{ maxWidth: 580, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" }}>Tasks</h1>
               <div style={{ fontSize: 12, color: "#aaa", marginTop: 2 }}>{counts.total} active · {counts.done} done</div>
             </div>
-            <button onClick={() => setShowAdd(true)} style={{ fontSize: 13, padding: "8px 16px", background: "#222", color: "white", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 500 }}>+ New</button>
+            <button onClick={() => setShowAdd(true)} className="new-task-btn" style={{ fontSize: 13, padding: "8px 16px", background: "#222", color: "white", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 500 }}>+ New</button>
           </div>
 
           {/* Filters */}
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12, alignItems: "center" }}>
             {["All", ...PRIORITIES].map(p => (
-              <button key={p} onClick={() => setFilter(p)} style={{
+              <button key={p} onClick={() => setFilter(p)} className="filter-pill" style={{
                 fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
                 borderColor: filter === p ? "#222" : "#e8e8e8",
                 background: filter === p ? "#222" : "white",
@@ -625,7 +626,7 @@ export default function TaskTracker() {
                 cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0
               }}
             >{managingCats ? "Done" : "⚙"}</button>
-            <button onClick={() => setCatFilter("All")} style={{
+            <button onClick={() => setCatFilter("All")} className="filter-pill" style={{
               fontSize: 12, padding: "5px 12px", borderRadius: 20, border: "1.5px solid",
               borderColor: catFilter === "All" ? "#222" : "#e8e8e8",
               background: catFilter === "All" ? "#222" : "white",
@@ -634,7 +635,7 @@ export default function TaskTracker() {
             }}>All</button>
             {categories.map(c => (
               <div key={c.id} style={{ position: "relative", display: "inline-flex", alignItems: "center", flexShrink: 0 }}>
-                <button onClick={() => setCatFilter(c.name)} style={{
+                <button onClick={() => setCatFilter(c.name)} className="filter-pill" style={{
                   fontSize: 12,
                   padding: managingCats ? "5px 26px 5px 12px" : "5px 12px",
                   borderRadius: 20, border: "1.5px solid",
