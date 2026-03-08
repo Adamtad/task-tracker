@@ -121,21 +121,27 @@
     box-sizing: border-box;
   }
 
-  /* Subtask rows */
-  .subtask-row .subtask-date-wrap {
-    width: 100%;
-  }
-  .subtask-row .subtask-date-wrap input {
-    width: 100% !important;
+  /* Subtask rows — compact date input */
+  .subtask-row .subtask-date-wrap input[type="date"] {
+    width: 36px !important;
+    color: transparent;
+    padding: 4px !important;
     box-sizing: border-box;
+  }
+  .subtask-row .subtask-date-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+    margin: 0;
+    opacity: 0.5;
   }
 
-  /* Add step row */
-  .subtask-add-row {
-    flex-wrap: wrap !important;
-  }
+  /* Add step row — compact date input */
   .subtask-add-row input[type="date"] {
-    width: 100% !important;
+    width: 36px !important;
+    color: transparent;
+    padding: 4px !important;
     box-sizing: border-box;
+  }
+  .subtask-add-row input[type="date"]::-webkit-calendar-picker-indicator {
+    margin: 0;
+    opacity: 0.5;
   }
 }
