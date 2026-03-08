@@ -126,7 +126,7 @@ function SubtaskList({ subtasks, onToggle, onDelete, onAdd, onUpdateDueDate }) {
     <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #f0f0f0" }}>
       <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Steps</div>
       {subtasks.map((s, i) => (
-        <div key={s.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+        <div key={s.id} className="subtask-row" style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, color: "#ccc", minWidth: 14, paddingTop: 2 }}>{i + 1}.</div>
             <button
@@ -141,7 +141,7 @@ function SubtaskList({ subtasks, onToggle, onDelete, onAdd, onUpdateDueDate }) {
             </button>
             <span style={{ fontSize: 13, color: s.done ? "#bbb" : "#444", textDecoration: s.done ? "line-through" : "none", lineHeight: 1.4 }}>{s.text}</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <div className="subtask-date-wrap" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <input
               type="date"
               value={s.dueDate || ""}
@@ -153,7 +153,7 @@ function SubtaskList({ subtasks, onToggle, onDelete, onAdd, onUpdateDueDate }) {
           </div>
         </div>
       ))}
-      <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+      <div className="subtask-add-row" style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
         <input
           value={newStep}
           onChange={(e) => setNewStep(e.target.value)}
@@ -244,7 +244,7 @@ function TaskCard({ task, categories, onToggleDone, onToggleSubtask, onDeleteSub
         </div>
 
         {/* Actions */}
-        <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+        <div className="task-actions" style={{ display: "flex", gap: 4, flexShrink: 0 }}>
           <button onClick={() => onEdit(task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: 14, padding: "2px 4px", lineHeight: 1 }} title="Edit">✎</button>
           <button onClick={() => onExpand(task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: expanded ? "#4a7fa5" : "#ccc", fontSize: 16, padding: "2px 4px", lineHeight: 1 }} title="Expand">
             {expanded ? "▴" : "▾"}
@@ -342,7 +342,7 @@ const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setC
         </div>
       </div>
     </div>
-    <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+    <div className="form-two-col" style={{ display: "flex", gap: 10, marginBottom: 16 }}>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 5 }}>Category</div>
         <CategorySelect categories={categories} value={category} onChange={setCategory} onAddCategory={onAddCategory} />
@@ -355,7 +355,7 @@ const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setC
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Steps (optional)</div>
       {steps.map((step, i) => (
-        <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
+        <div key={i} className="step-row" style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
           <span style={{ fontSize: 11, color: "#ccc", minWidth: 16 }}>{i + 1}.</span>
           <input
             value={step.text}
@@ -369,7 +369,7 @@ const TaskFormFields = ({ title, setTitle, priority, setPriority, category, setC
             value={step.dueDate}
             onChange={(e) => { const s = [...steps]; s[i] = { ...s[i], dueDate: e.target.value }; setSteps(s); }}
             title="Step due date"
-            style={{ fontSize: 12, padding: "7px 8px", border: "1.5px solid #e8e8e8", borderRadius: 8, outline: "none", color: "#444", width: 130 }}
+            className="step-date" style={{ fontSize: 12, padding: "7px 8px", border: "1.5px solid #e8e8e8", borderRadius: 8, outline: "none", color: "#444", width: 130 }}
           />
           {steps.length > 1 && (
             <button type="button" onClick={() => setSteps(steps.filter((_, j) => j !== i))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 18, padding: "0 4px" }}>×</button>
