@@ -1,82 +1,75 @@
 # Task Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple task list app built with React. Add tasks with priority, category, due date, optional description, and sub-tasks (with their own due dates). Tasks are sorted by the soonest sub-task or task due date. Data is saved in your browser (localStorage) so it survives refresh and redeploys.
 
-## Deploy to Vercel (access from any device)
+**Tech:** [Create React App](https://github.com/facebook/create-react-app), React 19.  
+**Hosting:** GitHub ([Adamtad/task-tracker](https://github.com/Adamtad/task-tracker)) with automatic deploys to [Vercel](https://vercel.com).
 
-Deploy to [Vercel](https://vercel.com) (free) to get a link you can open from your phone, tablet, or any computer:
+---
 
-1. Install the Vercel CLI: `npm i -g vercel` or just use `npx vercel` (no install needed).
-2. In this project folder run: **`npx vercel`**
-3. Log in with GitHub or email when prompted.
-4. Accept the defaults (it will detect Create React App and use the existing `vercel.json`).
-5. For a production URL run: **`npx vercel --prod`**
+## Setup
 
-You’ll get a URL like `https://task-tracker-xxxx.vercel.app`. To update the site after making changes, run `npx vercel --prod` again from this folder.
+- **Node.js** (v18 or newer) and **npm** — [nodejs.org](https://nodejs.org)
+- (Optional) **Git** and a **GitHub** account if you want to push changes
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Run locally
 
-### `npm start`
+1. **Clone the repo** (or open the project folder if you already have it):
+   ```bash
+   git clone https://github.com/Adamtad/task-tracker.git
+   cd task-tracker
+   ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+3. **Start the dev server:**
+   ```bash
+   npm start
+   ```
+   The app opens at [http://localhost:3000](http://localhost:3000). Edit the code and the page will reload automatically.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Push your changes
 
-### `npm run build`
+When you’ve made changes and want to update the live site:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Stage and commit:**
+   ```bash
+   git add -A
+   git commit -m "Short description of what you changed"
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **Push to GitHub:**
+   ```bash
+   git push origin master
+   ```
+   Vercel is connected to this repo, so each push to `master` triggers a new deployment. The live site usually updates within a minute or two.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Optional — deploy without pushing:** To deploy from your machine without using Git:
+   ```bash
+   npx vercel --prod
+   ```
+   You need to be logged in to Vercel (`npx vercel login` if not).
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Available scripts
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Command | Description |
+|--------|-------------|
+| `npm start` | Run the app locally at [http://localhost:3000](http://localhost:3000) |
+| `npm run build` | Production build into the `build` folder |
+| `npm test` | Run the test runner |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Learn more
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [Create React App docs](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React docs](https://reactjs.org/)
