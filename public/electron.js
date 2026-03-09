@@ -2,6 +2,11 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const isDev = !app.isPackaged;
 
+// Pin userData to a fixed location so data persists across EXE versions
+if (!isDev) {
+  app.setPath("userData", path.join(app.getPath("appData"), "Task Tracker"));
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1100,

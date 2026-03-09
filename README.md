@@ -1,75 +1,65 @@
 # Task Tracker
 
-A simple task list app built with React. Add tasks with priority, category, due date, optional description, and sub-tasks (with their own due dates). Tasks are sorted by the soonest sub-task or task due date. Data is saved in your browser (localStorage) so it survives refresh and redeploys.
+A clean, local-first task management app built with React and packaged as a Windows desktop app with Electron.
 
-**Tech:** [Create React App](https://github.com/facebook/create-react-app), React 19.  
-**Hosting:** GitHub ([Adamtad/task-tracker](https://github.com/Adamtad/task-tracker)) with automatic deploys to [Vercel](https://vercel.com).
+Add tasks with priority, category, due date, description, and sub-tasks (each with their own due dates). Tasks with a future start date go into a **Waiting** column and automatically surface when ready. All data is saved locally — nothing is sent anywhere.
 
----
-
-## Setup
-
-- **Node.js** (v18 or newer) and **npm** — [nodejs.org](https://nodejs.org)
-- (Optional) **Git** and a **GitHub** account if you want to push changes
+**Version:** 1.2.0
+**Tech:** React 19, Electron 40, Create React App
+**Distribution:** Windows portable EXE — available on the [Microsoft Store](https://apps.microsoft.com) *(coming soon)*
 
 ---
 
-## Run locally
+## Features
 
-1. **Clone the repo** (or open the project folder if you already have it):
-   ```bash
-   git clone https://github.com/Adamtad/task-tracker.git
-   cd task-tracker
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the dev server:**
-   ```bash
-   npm start
-   ```
-   The app opens at [http://localhost:3000](http://localhost:3000). Edit the code and the page will reload automatically.
+- Add tasks with title, priority (High / Medium / Low), category, due date, and description
+- Sub-tasks with individual due dates and completion tracking
+- **Waiting column** — tasks with a future "waiting until" date are separated and surface automatically
+- Custom categories with color labels
+- Tasks sorted by soonest due date (sub-tasks included)
+- Floating **+** button to add tasks quickly
+- New tasks start collapsed for a clean view
+- Mobile-friendly with tab switching between Active and Waiting
+- All data stored locally — survives restarts, no account needed
+- Data persists across EXE version upgrades
 
 ---
 
-## Push your changes
+## Download
 
-When you’ve made changes and want to update the live site:
+Grab the latest portable EXE from [Releases](https://github.com/Adamtad/task-tracker/releases). No install required — just run it.
 
-1. **Stage and commit:**
-   ```bash
-   git add -A
-   git commit -m "Short description of what you changed"
-   ```
+---
 
-2. **Push to GitHub:**
-   ```bash
-   git push origin master
-   ```
-   Vercel is connected to this repo, so each push to `master` triggers a new deployment. The live site usually updates within a minute or two.
+## Development setup
 
-**Optional — deploy without pushing:** To deploy from your machine without using Git:
-   ```bash
-   npx vercel --prod
-   ```
-   You need to be logged in to Vercel (`npx vercel login` if not).
+**Requirements:** Node.js v18+ and npm — [nodejs.org](https://nodejs.org)
+
+```bash
+git clone https://github.com/Adamtad/task-tracker.git
+cd task-tracker
+npm install
+```
 
 ---
 
 ## Available scripts
 
 | Command | Description |
-|--------|-------------|
-| `npm start` | Run the app locally at [http://localhost:3000](http://localhost:3000) |
-| `npm run build` | Production build into the `build` folder |
-| `npm test` | Run the test runner |
+|---------|-------------|
+| `npm start` | Run in browser at [http://localhost:3000](http://localhost:3000) |
+| `npm run electron-dev` | Run as desktop app with hot reload |
+| `npm run electron-build` | Build portable Windows EXE to `dist/` |
+| `npm run build` | Production web build into `build/` |
+| `npm test` | Run tests |
 
 ---
 
-## Learn more
+## Data storage
 
-- [Create React App docs](https://facebook.github.io/create-react-app/docs/getting-started)
-- [React docs](https://reactjs.org/)
+| Platform | Location |
+|----------|----------|
+| Windows EXE | `%AppData%\Task Tracker\Local Storage\` |
+| Browser | Browser localStorage |
+
+Data is pinned to a fixed path so it survives EXE upgrades.
