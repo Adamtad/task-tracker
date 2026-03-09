@@ -4,10 +4,6 @@ const STORAGE_KEY = "task-tracker-data";
 
 const CAT_PALETTE = ["#4a7fa5", "#9b6db5", "#5a9e6f", "#d4754e", "#e09a2f", "#2d7d9a", "#c75b7a", "#6b8e6b", "#a06b0e", "#888"];
 
-const DEFAULT_CATEGORIES = [];
-
-const DEFAULT_TASKS = [];
-
 function loadPersistedState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
