@@ -675,7 +675,7 @@ export default function TaskTracker() {
   }, []);
 
   const deleteTask = (id) => setTasks(tasks.filter(t => t.id !== id));
-  const addTask = (task) => { setTasks([task, ...tasks]); setExpanded(new Set([...expanded, task.id])); };
+  const addTask = (task) => { setTasks([task, ...tasks]); };
   const updateTask = (updated) => {
     setTasks(tasks.map(t => t.id === updated.id ? updated : t));
     setEditingTaskId(null);
