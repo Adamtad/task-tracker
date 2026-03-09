@@ -571,11 +571,11 @@ function UpdateBanner() {
 export default function TaskTracker() {
   const [tasks, setTasks] = useState(() => {
     const s = loadPersistedState();
-    return s ? s.tasks : DEFAULT_TASKS;
+    return s ? s.tasks : [];
   });
   const [categories, setCategories] = useState(() => {
     const s = loadPersistedState();
-    return s?.categories || DEFAULT_CATEGORIES;
+    return s?.categories || [];
   });
   const [showAdd, setShowAdd] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
