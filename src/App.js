@@ -736,7 +736,6 @@ export default function TaskTracker() {
                 {counts.total} active{counts.waiting > 0 ? ` · ${counts.waiting} waiting` : ""} · {counts.done} done
               </div>
             </div>
-            <button onClick={() => setShowAdd(true)} className="new-task-btn" style={{ fontSize: 13, padding: "8px 16px", background: "#222", color: "white", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 500 }}>+ New</button>
           </div>
 
           {/* Filters */}
@@ -869,6 +868,13 @@ export default function TaskTracker() {
           )}
         </div>
       </div>
+
+      {/* Floating action button */}
+      <button
+        onClick={() => setShowAdd(true)}
+        style={{ position: "fixed", bottom: 28, right: 24, width: 56, height: 56, borderRadius: "50%", background: "#222", color: "white", fontSize: 28, lineHeight: 1, border: "none", cursor: "pointer", boxShadow: "0 4px 16px rgba(0,0,0,0.25)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
+        title="New task"
+      >+</button>
 
       {showAdd && <AddTaskModal onAdd={addTask} onClose={() => setShowAdd(false)} categories={categories} onAddCategory={addCategory} />}
       {editingTaskId && (() => {
