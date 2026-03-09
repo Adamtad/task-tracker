@@ -591,8 +591,16 @@ export default function TaskTracker() {
   const [catFilter, setCatFilter] = useState("All");
   const [showDone, setShowDone] = useState(false);
   const [showWaitingCol, setShowWaitingCol] = useState(true);
+  const [mobileTab, setMobileTab] = useState("active"); // "active" | "waiting"
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
   const [addingCat, setAddingCat] = useState(false);
   const [newCatInput, setNewCatInput] = useState("");
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(
@@ -797,10 +805,28 @@ export default function TaskTracker() {
       </div>
 
       {/* Task list */}
-      <div style={{ maxWidth: splitView ? 1200 : 580, margin: "0 auto", padding: "20px 16px 0" }}>
+      <div style={{ maxWidth: splitView && !isMobile ? 1200 : 580, margin: "0 auto", padding: "20px 16px 0" }}>
 
-        {/* Waiting column toggle */}
-        {hasWaiting && (
+        {/* Mobile tabs — shown when there are waiting tasks on a small screen */}
+        {hasWaiting && isMobile && (
+          <div style={{ display: "flex", borderBottom: "2px solid #f0f0f0", marginBottom: 16 }}>
+            <button
+              onClick={() => setMobileTab("active")}
+              style={{ flex: 1, padding: "8px 0", fontSize: 13, fontWeight: 600, background: "none", border: "none", cursor: "pointer", color: mobileTab === "active" ? "#333" : "#bbb", borderBottom: mobileTab === "active" ? "2px solid #333" : "2px solid transparent", marginBottom: -2 }}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setMobileTab("waiting")}
+              style={{ flex: 1, padding: "8px 0", fontSize: 13, fontWeight: 600, background: "none", border: "none", cursor: "pointer", color: mobileTab === "waiting" ? "#b8a87a" : "#bbb", borderBottom: mobileTab === "waiting" ? "2px solid #b8a87a" : "2px solid transparent", marginBottom: -2 }}
+            >
+              ⏳ Waiting ({waitingTasks.length})
+            </button>
+          </div>
+        )}
+
+        {/* Desktop: waiting column toggle */}
+        {hasWaiting && !isMobile && (
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
             <button
               onClick={() => setShowWaitingCol(!showWaitingCol)}
@@ -811,29 +837,31 @@ export default function TaskTracker() {
           </div>
         )}
 
-        <div style={{ display: splitView ? "flex" : "block", gap: 24, alignItems: "flex-start" }}>
-          {/* Active column */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {splitView && <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>Active</div>}
-            {filtered.length === 0 && (
-              <div style={{ textAlign: "center", color: "#bbb", fontSize: 14, padding: "60px 0" }}>
-                {tasks.filter(t => !t.waiting).length === 0 ? "No tasks yet. Add your first one!" : "No tasks match this filter."}
-              </div>
-            )}
-            {filtered.map(task => (
-              <TaskCard key={task.id} task={task} expanded={expanded.has(task.id)} {...taskCardProps} />
-            ))}
-            {counts.done > 0 && (
-              <button onClick={() => setShowDone(!showDone)} style={{ fontSize: 12, color: "#aaa", background: "none", border: "none", cursor: "pointer", padding: "8px 0", display: "block", margin: "4px auto" }}>
-                {showDone ? "Hide" : "Show"} {counts.done} completed task{counts.done !== 1 ? "s" : ""}
-              </button>
-            )}
-          </div>
+        <div style={{ display: splitView && !isMobile ? "flex" : "block", gap: 24, alignItems: "flex-start" }}>
+          {/* Active column — hidden on mobile when waiting tab is selected */}
+          {(!isMobile || !hasWaiting || mobileTab === "active") && (
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {splitView && !isMobile && <div style={{ fontSize: 11, fontWeight: 600, color: "#aaa", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>Active</div>}
+              {filtered.length === 0 && (
+                <div style={{ textAlign: "center", color: "#bbb", fontSize: 14, padding: "60px 0" }}>
+                  {tasks.filter(t => !t.waiting).length === 0 ? "No tasks yet. Add your first one!" : "No tasks match this filter."}
+                </div>
+              )}
+              {filtered.map(task => (
+                <TaskCard key={task.id} task={task} expanded={expanded.has(task.id)} {...taskCardProps} />
+              ))}
+              {counts.done > 0 && (
+                <button onClick={() => setShowDone(!showDone)} style={{ fontSize: 12, color: "#aaa", background: "none", border: "none", cursor: "pointer", padding: "8px 0", display: "block", margin: "4px auto" }}>
+                  {showDone ? "Hide" : "Show"} {counts.done} completed task{counts.done !== 1 ? "s" : ""}
+                </button>
+              )}
+            </div>
+          )}
 
-          {/* Waiting column */}
-          {splitView && (
-            <div style={{ width: 360, flexShrink: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#b8a87a", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>⏳ Waiting ({waitingTasks.length})</div>
+          {/* Waiting column — sidebar on desktop, tab on mobile */}
+          {hasWaiting && (splitView && !isMobile || isMobile && mobileTab === "waiting") && (
+            <div style={{ width: isMobile ? "100%" : 360, flexShrink: 0 }}>
+              {!isMobile && <div style={{ fontSize: 11, fontWeight: 600, color: "#b8a87a", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>⏳ Waiting ({waitingTasks.length})</div>}
               {waitingTasks.map(task => (
                 <TaskCard key={task.id} task={task} expanded={expanded.has(task.id)} {...taskCardProps} />
               ))}
